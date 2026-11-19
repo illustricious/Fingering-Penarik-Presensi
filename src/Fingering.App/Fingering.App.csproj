@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>Fingering</AssemblyName>
+    <RootNamespace>Fingering</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <ApplicationIcon>Assets\fingering.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Product>Fingering</Product>
+    <Company>illustricious</Company>
+    <Authors>illustricious</Authors>
+    <Copyright>Copyright (c) illustricious</Copyright>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Description>Cuma butuh satu jari buat kamu puas</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\icon.png" />
+    <ProjectReference Include="../Fingering.Core/Fingering.Core.csproj" />
+    <PackageReference Include="Avalonia" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,268 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Fingering.App"
+             RequestedThemeVariant="Light">
+  <Application.Resources>
+    <!-- override brush tema Fluent untuk dropdown (jaga-jaga bila selector template tidak kena sasaran) -->
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#FFF4D6" />
+          <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#111111" />
+          <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#FFD93D" />
+          <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#FFD93D" />
+          <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#111111" />
+          <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#111111" />
+          <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#FFD93D" />
+          <SolidColorBrush x:Key="ComboBoxItemBackgroundPressed" Color="#FFD93D" />
+          <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#111111" />
+          <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPointerOver" Color="#111111" />
+          <SolidColorBrush x:Key="ComboBoxItemBackgroundSelectedPressed" Color="#111111" />
+          <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#FFD93D" />
+          <SolidColorBrush x:Key="ComboBoxItemForegroundSelectedPointerOver" Color="#FFD93D" />
+          <SolidColorBrush x:Key="ComboBoxItemForegroundSelectedPressed" Color="#FFD93D" />
+          <SolidColorBrush x:Key="ComboBoxItemForegroundPointerOver" Color="#111111" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+  <Application.Styles>
+    <FluentTheme />
+
+    <!-- ===== Neobrutalism: garis tebal hitam, bayangan keras tanpa blur, warna jenuh ===== -->
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="fonts:Inter#Inter" />
+      <Setter Property="Background" Value="#FFF4D6" />
+    </Style>
+
+    <Style Selector="Button.neo">
+      <Setter Property="Background" Value="#FFD93D" />
+      <Setter Property="Foreground" Value="#111111" />
+      <Setter Property="FontWeight" Value="Black" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Padding" Value="14,8" />
+      <Setter Property="Margin" Value="0,0,8,8" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="Bd" Background="{TemplateBinding Background}" BorderBrush="#111111" BorderThickness="3"
+                  CornerRadius="8" BoxShadow="4 4 0 0 #111111" Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.neo:pointerover /template/ Border#Bd">
+      <Setter Property="RenderTransform" Value="translate(-1px,-1px)" />
+      <Setter Property="BoxShadow" Value="5 5 0 0 #111111" />
+    </Style>
+    <Style Selector="Button.neo:pressed /template/ Border#Bd">
+      <Setter Property="RenderTransform" Value="translate(3px,3px)" />
+      <Setter Property="BoxShadow" Value="1 1 0 0 #111111" />
+    </Style>
+    <Style Selector="Button.neo:disabled /template/ Border#Bd">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+    <Style Selector="Button.pink"><Setter Property="Background" Value="#FF6B9D" /></Style>
+    <Style Selector="Button.green"><Setter Property="Background" Value="#5BE584" /></Style>
+    <Style Selector="Button.blue"><Setter Property="Background" Value="#7B9BFF" /></Style>
+    <Style Selector="Button.white"><Setter Property="Background" Value="#FFFFFF" /></Style>
+    <Style Selector="Button.red"><Setter Property="Background" Value="#FF4D4D" /></Style>
+    <Style Selector="Button.cap /template/ Border#Bd"><Setter Property="BoxShadow" Value="2 2 0 0 #111111" /></Style>
+    <Style Selector="Button.cap:pointerover /template/ Border#Bd"><Setter Property="BoxShadow" Value="3 3 0 0 #111111" /></Style>
+    <Style Selector="Button.cap:pressed /template/ Border#Bd"><Setter Property="BoxShadow" Value="0 0 0 0 #111111" /></Style>
+    <Style Selector="Button.nav.active /template/ Border#Bd"><Setter Property="Background" Value="#111111" /></Style>
+    <Style Selector="Button.nav.active"><Setter Property="Foreground" Value="#FFD93D" /></Style>
+
+    <Style Selector="TextBox.neo">
+      <Setter Property="Background" Value="#FFFFFF" />
+      <Setter Property="Foreground" Value="#111111" />
+      <Setter Property="BorderBrush" Value="#111111" />
+      <Setter Property="BorderThickness" Value="3" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="MinHeight" Value="42" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBox.neo:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="#111111" />
+      <Setter Property="Background" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="TextBox.neo:focus /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="#111111" />
+      <Setter Property="Background" Value="#FFF3A8" />
+    </Style>
+
+    <Style Selector="CheckBox.neo">
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="#111111" />
+    </Style>
+    <Style Selector="CheckBox.neo:checked /template/ Border#NormalRectangle">
+      <Setter Property="Background" Value="#5BE584" />
+      <Setter Property="BorderBrush" Value="#111111" />
+    </Style>
+    <Style Selector="CheckBox.neo /template/ Border#NormalRectangle">
+      <Setter Property="BorderBrush" Value="#111111" />
+      <Setter Property="BorderThickness" Value="3" />
+      <Setter Property="Width" Value="24" />
+      <Setter Property="Height" Value="24" />
+    </Style>
+
+    <!-- ===== Dropdown (ComboBox): kotak putih berbingkai tebal; daftar krem; item sorot kuning; terpilih hitam ===== -->
+    <Style Selector="ComboBox">
+      <Setter Property="Foreground" Value="#111111" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="ComboBox:pointerover /template/ Border#Background">
+      <Setter Property="Background" Value="#FFD93D" />
+      <Setter Property="BorderBrush" Value="#111111" />
+    </Style>
+    <Style Selector="ComboBox:pressed /template/ Border#Background">
+      <Setter Property="Background" Value="#FFD93D" />
+      <Setter Property="BorderBrush" Value="#111111" />
+    </Style>
+    <Style Selector="ComboBox:dropdownopen /template/ Border#Background">
+      <Setter Property="Background" Value="#FFF3A8" />
+      <Setter Property="BorderBrush" Value="#111111" />
+    </Style>
+    <Style Selector="ComboBox:focus-visible /template/ Border#HighlightBackground">
+      <Setter Property="Background" Value="#FFF3A8" />
+      <Setter Property="BorderBrush" Value="#111111" />
+    </Style>
+    <Style Selector="ComboBox /template/ PathIcon#DropDownGlyph">
+      <Setter Property="Foreground" Value="#111111" />
+    </Style>
+    <Style Selector="ComboBox /template/ Border#PopupBorder">
+      <Setter Property="Background" Value="#FFF4D6" />
+      <Setter Property="BorderBrush" Value="#111111" />
+      <Setter Property="BorderThickness" Value="3" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="4" />
+    </Style>
+    <Style Selector="ComboBoxItem">
+      <Setter Property="Foreground" Value="#111111" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Margin" Value="0,1" />
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#FFD93D" />
+      <Setter Property="Foreground" Value="#111111" />
+    </Style>
+    <Style Selector="ComboBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#111111" />
+      <Setter Property="Foreground" Value="#FFD93D" />
+    </Style>
+    <Style Selector="ComboBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#111111" />
+      <Setter Property="Foreground" Value="#FFD93D" />
+    </Style>
+
+    <!-- ===== Konsol: latar tetap gelap saat hover/fokus/seleksi, supaya teks hijau tetap terbaca ===== -->
+    <Style Selector="TextBox.console">
+      <Setter Property="Background" Value="#111111" />
+      <Setter Property="Foreground" Value="#A6FFB8" />
+    </Style>
+    <Style Selector="TextBox.console:pointerover">
+      <Setter Property="Background" Value="#111111" />
+      <Setter Property="Foreground" Value="#A6FFB8" />
+    </Style>
+    <Style Selector="TextBox.console:focus">
+      <Setter Property="Background" Value="#111111" />
+      <Setter Property="Foreground" Value="#A6FFB8" />
+    </Style>
+    <Style Selector="TextBox.console /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="#111111" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="TextBox.console:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="#111111" />
+    </Style>
+    <Style Selector="TextBox.console:focus /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="#111111" />
+    </Style>
+
+    <!-- ===== Scrollbar neobrutalism: jalur krem bergaris hitam, pegangan kuning bergaris tebal; selalu tampak ===== -->
+    <Style Selector="ScrollViewer">
+      <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="ScrollBar">
+      <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="ScrollBar:vertical">
+      <Setter Property="Width" Value="20" />
+      <Setter Property="MinWidth" Value="20" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="#FFF4D6" BorderBrush="#111111" BorderThickness="3,0,0,0">
+            <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
+                   Orientation="{TemplateBinding Orientation}" IsDirectionReversed="True">
+              <Track.DecreaseButton>
+                <RepeatButton Name="PART_PageUpButton" Focusable="False" IsTabStop="False">
+                  <RepeatButton.Template><ControlTemplate><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template>
+                </RepeatButton>
+              </Track.DecreaseButton>
+              <Track.IncreaseButton>
+                <RepeatButton Name="PART_PageDownButton" Focusable="False" IsTabStop="False">
+                  <RepeatButton.Template><ControlTemplate><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template>
+                </RepeatButton>
+              </Track.IncreaseButton>
+              <Thumb MinHeight="36" Cursor="Hand">
+                <Thumb.Template>
+                  <ControlTemplate>
+                    <Border Name="ThumbBd" Background="#FFD93D" BorderBrush="#111111" BorderThickness="3" CornerRadius="6" Margin="2,2,2,2" />
+                  </ControlTemplate>
+                </Thumb.Template>
+              </Thumb>
+            </Track>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="ScrollBar:horizontal">
+      <Setter Property="Height" Value="20" />
+      <Setter Property="MinHeight" Value="20" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="#FFF4D6" BorderBrush="#111111" BorderThickness="0,3,0,0">
+            <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
+                   Orientation="{TemplateBinding Orientation}">
+              <Track.DecreaseButton>
+                <RepeatButton Name="PART_PageLeftButton" Focusable="False" IsTabStop="False">
+                  <RepeatButton.Template><ControlTemplate><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template>
+                </RepeatButton>
+              </Track.DecreaseButton>
+              <Track.IncreaseButton>
+                <RepeatButton Name="PART_PageRightButton" Focusable="False" IsTabStop="False">
+                  <RepeatButton.Template><ControlTemplate><Border Background="Transparent" /></ControlTemplate></RepeatButton.Template>
+                </RepeatButton>
+              </Track.IncreaseButton>
+              <Thumb MinWidth="36" Cursor="Hand">
+                <Thumb.Template>
+                  <ControlTemplate>
+                    <Border Name="ThumbBd" Background="#FFD93D" BorderBrush="#111111" BorderThickness="3" CornerRadius="6" Margin="2,2,2,2" />
+                  </ControlTemplate>
+                </Thumb.Template>
+              </Thumb>
+            </Track>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="ScrollBar Thumb:pointerover /template/ Border#ThumbBd">
+      <Setter Property="Background" Value="#FF6B9D" />
+    </Style>
+    <Style Selector="ScrollBar Thumb:pressed /template/ Border#ThumbBd">
+      <Setter Property="Background" Value="#5BE584" />
+    </Style>
+  </Application.Styles>
+</Application>

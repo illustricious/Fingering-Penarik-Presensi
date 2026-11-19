@@ -1,0 +1,77 @@
+name: Build packages
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install packaging and desktop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm desktop-file-utils xvfb libice6 libsm6 libfontconfig1 libfreetype6 libx11-6 libxcursor1 libxrandr2 libxi6 libgl1 libssl3 zlib1g
+      - name: Run tests (including SQLCipher and FK simulator)
+        run: dotnet test tests/Fingering.Tests -c Release --logger 'trx;LogFileName=tests.trx'
+      - name: Build and verify DEB and RPM
+        run: bash installer/linux/package.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fingering-linux-x64
+          path: artifacts/packages/*
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tests-linux
+          path: tests/**/TestResults/*.trx
+
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            rid: osx-arm64
+          - runner: macos-15-intel
+            rid: osx-x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Run tests (including native SQLCipher)
+        run: dotnet test tests/Fingering.Tests -c Release --logger 'trx;LogFileName=tests.trx'
+      - name: Build and verify DMG
+        run: bash installer/macos/package.sh '${{ matrix.rid }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Fingering-${{ matrix.rid }}
+          path: artifacts/packages/*
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tests-${{ matrix.rid }}
+          path: tests/**/TestResults/*.trx

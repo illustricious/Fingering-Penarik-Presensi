@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Fingering
+GenericName=Penarik presensi
+Comment=Rewrite aplikasi penarik presensi Fingerspot Revo
+Exec=/usr/bin/fingering
+Icon=fingering
+Terminal=false
+Categories=Office;Utility;
+Keywords=presensi;absensi;fingerprint;
