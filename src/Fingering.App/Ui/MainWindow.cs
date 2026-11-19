@@ -750,7 +750,7 @@ public sealed class MainWindow : Window
     // ---- dialog ----
     void Toast(string msg) => conHead.Text = msg;
 
-    Task<bool> Confirm(string msg)
+    async Task<bool> Confirm(string msg)
     {
         var tcs = new TaskCompletionSource<bool>();
         var w = new Window { Title = "Konfirmasi", Width = 460, SizeToContent = SizeToContent.Height, WindowStartupLocation = WindowStartupLocation.CenterOwner, CanResize = false };
@@ -763,7 +763,7 @@ public sealed class MainWindow : Window
         w.Content = Neo.Frame(w, p, w.Title ?? "", false, true);
         w.Closed += (_, _) => tcs.TrySetResult(false);
         await w.ShowDialog(this);
-        return tcs.Task;
+        return await tcs.Task;
     }
 
     /// <summary>Konfirmasi ganda: (1) dialog Ya/Batal, (2) ketik teks yang diminta DAN sandi login.</summary>
@@ -793,7 +793,7 @@ public sealed class MainWindow : Window
         p.Children.Add(row);
         w.Content = Neo.Frame(w, p, w.Title ?? "", false, true);
         w.Closed += (_, _) => tcs.TrySetResult(false);
-        w.ShowDialog(this);
+        await w.ShowDialog(this);
         return await tcs.Task;
     }
 
