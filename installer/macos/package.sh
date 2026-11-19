@@ -10,10 +10,23 @@ publish="$root/artifacts/publish-$rid"
 stage="$root/artifacts/dmg-$rid"
 app="$stage/Fingering.app"
 output="$root/artifacts/packages"
-mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$output"
+mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$app/Contents/Frameworks" "$output"
 dotnet publish src/Fingering.App -c Release -r "$rid" --self-contained true \
-  -p:PublishSingleFile=false -p:DebugType=none -o "$publish"
-cp -R "$publish/." "$app/Contents/MacOS/"
+  -p:PublishSingleFile=true -p:DebugType=none -o "$publish"
+# Apple expects executable code in MacOS/Frameworks and managed resources in
+# Resources. Relative links keep the .NET host's original lookup paths working.
+while IFS= read -r -d '' item; do
+  name=$(basename "$item")
+  if [[ "$name" == Fingering ]]; then
+    cp "$item" "$app/Contents/MacOS/"
+  elif file "$item" | grep -q 'Mach-O'; then
+    cp "$item" "$app/Contents/Frameworks/"
+    ln -s "../Frameworks/$name" "$app/Contents/MacOS/$name"
+  else
+    cp -R "$item" "$app/Contents/Resources/"
+    ln -s "../Resources/$name" "$app/Contents/MacOS/$name"
+  fi
+done < <(find "$publish" -mindepth 1 -maxdepth 1 -print0)
 chmod 755 "$app/Contents/MacOS/Fingering"
 
 iconset="$root/artifacts/Fingering-$rid.iconset"
@@ -47,7 +60,8 @@ while IFS= read -r -d '' binary; do
   if file "$binary" | grep -q 'Mach-O'; then
     codesign --force --sign - --entitlements installer/macos/entitlements.plist "$binary"
   fi
-done < <(find "$app/Contents/MacOS" -type f -print0)
+done < <(find "$app/Contents/Frameworks" -type f -print0)
+codesign --force --sign - --entitlements installer/macos/entitlements.plist "$app/Contents/MacOS/Fingering"
 codesign --force --sign - --entitlements installer/macos/entitlements.plist "$app"
 codesign --verify --deep --strict --verbose=2 "$app"
 "$app/Contents/MacOS/Fingering" --version

@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-dotnet@v6.1.0
         with:
           dotnet-version: '10.0.x'
       - name: Install packaging and desktop dependencies
@@ -34,12 +34,12 @@ jobs:
         run: dotnet test tests/Fingering.Tests -c Release --logger 'trx;LogFileName=tests.trx'
       - name: Build and verify DEB and RPM
         run: bash installer/linux/package.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: Fingering-linux-x64
           path: artifacts/packages/*
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: tests-linux
@@ -57,20 +57,20 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-dotnet@v6.1.0
         with:
           dotnet-version: '10.0.x'
       - name: Run tests (including native SQLCipher)
         run: dotnet test tests/Fingering.Tests -c Release --logger 'trx;LogFileName=tests.trx'
       - name: Build and verify DMG
         run: bash installer/macos/package.sh '${{ matrix.rid }}'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: Fingering-${{ matrix.rid }}
           path: artifacts/packages/*
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: tests-${{ matrix.rid }}

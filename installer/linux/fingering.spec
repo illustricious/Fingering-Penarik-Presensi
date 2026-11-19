@@ -9,6 +9,7 @@ Requires: glibc >= 2.35, libstdc++, libgcc, zlib, openssl-libs
 Requires: libX11, libICE, libSM, fontconfig, freetype
 Recommends: libXcursor, libXrandr, libXi, mesa-libGL
 %global debug_package %{nil}
+%global __strip /bin/true
 
 %description
 Aplikasi desktop Avalonia/.NET untuk menarik presensi dari mesin Fingerspot

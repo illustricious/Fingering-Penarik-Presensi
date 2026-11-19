@@ -25,6 +25,11 @@ rpmbuild -bb installer/linux/fingering.spec --target x86_64 \
 cp "$top/RPMS/x86_64/fingering-${version}-1.x86_64.rpm" "$output/"
 rpm -qip "$output/fingering-${version}-1.x86_64.rpm"
 rpm -qlp "$output/fingering-${version}-1.x86_64.rpm"
+rpmcheck="$root/artifacts/rpm-check"
+mkdir -p "$rpmcheck"
+(cd "$rpmcheck" && rpm2cpio "$output/fingering-${version}-1.x86_64.rpm" | cpio -idm --quiet)
+cmp "$publish/Fingering" "$rpmcheck/opt/illustricious/fingering/Fingering"
+"$rpmcheck/opt/illustricious/fingering/Fingering" --version
 
 # Verify the installed Debian payload and launch the first-run window on a virtual X11 display.
 sudo dpkg -i "$output/fingering_${version}_amd64.deb"
