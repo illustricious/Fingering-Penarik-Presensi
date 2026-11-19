@@ -13,7 +13,7 @@ $out = Split-Path -Parent $here
 # SDK .NET 10: dari PATH, atau lokasi yang dipasang sesi sebelumnya
 $dotnet = (Get-Command dotnet -ErrorAction SilentlyContinue).Source
 if (-not $dotnet -or -not ((& $dotnet --list-sdks) -match '^10\.')) { throw "SDK .NET 10 tidak ditemukan. Pasang dari https://dot.net (channel 10.0)." }
-if ($Rid -notin @('win-x64', 'linux-x64', 'osx-x64', 'osx-arm64')) { throw "RID tidak didukung: $Rid" }
+if ($Rid -notin @('win-x64', 'win-arm64', 'linux-x64', 'osx-x64', 'osx-arm64')) { throw "RID tidak didukung: $Rid" }
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = "1"; $env:DOTNET_NOLOGO = "1"
 Set-Location $here
 

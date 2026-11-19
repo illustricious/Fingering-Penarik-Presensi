@@ -37,15 +37,19 @@ bash installer/macos/package.sh osx-x64
 bash installer/macos/package.sh osx-arm64
 ```
 
-Workflow [Build packages](.github/workflows/build.yml) menjalankan tes, build dan verifikasi pada Linux serta macOS setiap push ke `main`, pull request, tag `v*`, atau pemanggilan manual. Hasil di tab **Actions → Build packages → Artifacts**:
+Workflow [Build packages](.github/workflows/build.yml) menjalankan tes, build dan verifikasi pada Windows x64/ARM64, Linux serta macOS setiap push ke `main`, pull request, tag `v*`, atau pemanggilan manual. Paket rilis tersedia di [GitHub Releases](https://github.com/illustricious/Fingering-Penarik-Presensi/releases). Hasil setiap build juga tersedia di tab **Actions → Build packages → Artifacts**:
 
 | Target | Hasil |
 |---|---|
+| Windows Intel/AMD x64 | `Fingering-1.0.0-win-x64.exe` (portable) |
+| Windows ARM64 | `Fingering-1.0.0-win-arm64.exe` (portable) |
 | Linux x64 | `fingering_1.0.0_amd64.deb`, `fingering-1.0.0-1.x86_64.rpm` |
 | Mac Apple Silicon | `Fingering-1.0.0-osx-arm64.dmg` |
 | Mac Intel | `Fingering-1.0.0-osx-x64.dmg` |
 
 Setiap artifact paket menyertakan checksum SHA-256. Versi mengikuti `src/Fingering.App/Fingering.App.csproj`. DMG memakai tanda tangan **ad-hoc**, belum Developer ID/notarized; Gatekeeper dapat meminta persetujuan untuk aplikasi unduhan. Notarization memerlukan akun/sertifikat Apple Developer pemilik proyek.
+
+Untuk merilis versi baru, ubah versi aplikasi dan tabel paket, lalu push tag `v<versi>` atau jalankan workflow manual dengan `publish_release=true`. Release hanya dipublikasikan setelah seluruh job berhasil dan checksum keenam paket cocok. Release yang sudah ada tidak ditimpa otomatis.
 
 ## Batas bukti dan keamanan
 
