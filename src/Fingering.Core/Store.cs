@@ -36,7 +36,7 @@ public sealed class PunchFilter
     public int Limit = 200, Offset;
 }
 
-public sealed class Store : IDisposable
+public sealed partial class Store : IDisposable
 {
     public const string TimeFmt = "yyyy-MM-dd HH:mm:ss";
     readonly SqliteConnection db;
@@ -75,6 +75,12 @@ public sealed class Store : IDisposable
             Exec("ALTER TABLE employee ADD COLUMN shifts TEXT NOT NULL DEFAULT ''");
         if (Scalar<long>("SELECT count(*) FROM pragma_table_info('employee') WHERE name='grup'") == 0)
             Exec("ALTER TABLE employee ADD COLUMN grup TEXT NOT NULL DEFAULT ''");
+        Exec(@"CREATE TABLE IF NOT EXISTS device_password (
+            device_id INTEGER NOT NULL REFERENCES device(id) ON DELETE CASCADE,
+            pin TEXT NOT NULL, name TEXT NOT NULL, privilege INTEGER NOT NULL,
+            has_password INTEGER NOT NULL, raw_data BLOB, fetched_at TEXT NOT NULL,
+            attempted_at TEXT NOT NULL, error TEXT NOT NULL DEFAULT '',
+            PRIMARY KEY(device_id,pin));");
     }
 
     public void Dispose() => db.Dispose();

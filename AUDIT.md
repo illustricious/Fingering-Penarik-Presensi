@@ -1,5 +1,15 @@
 # Audit source Fingering — 19 November 2026
 
+## Tambahan fitur password user — 21 November 2026
+
+Versi 1.1.0 menambah tab PASSWORD USER dan penarikan baca-saja untuk dialek `13_1`. Data enroll 10 disimpan dalam tabel `device_password` per mesin+PIN pada database SQLCipher dan ikut backup/restore penuh. Skema ditambahkan otomatis ketika membuka database lama.
+
+Hasil ASCII numerik hanya diberi label kandidat yang belum diverifikasi. Header PIN/jenis, panjang 84 byte, panjang field dan padding diperiksa sebelum interpretasi; format biner tidak ditebak. UI menyamarkan kandidat sampai diminta, menyediakan detail mentah yang dibuka secara sengaja, dan menandai data lama bila pembacaan ulang gagal. Payload user/enroll tidak ditulis ke log pekerjaan ini. Tidak ada ekspor password ke CSV/XLSX.
+
+Tes baru memakai simulator untuk memverifikasi tidak ada perintah tulis/hapus/atur jam, communication key dipakai, rahasia tidak masuk log, pembacaan campuran/ulang, penghapusan password/user pada snapshot, isolasi per mesin, migrasi DB lama, pencarian/paginasi, dan backup/restore terenkripsi. Format ASCII pada simulator adalah fixture pengujian, bukan bukti encoding password pada perangkat asli.
+
+## Audit awal
+
 Lingkup: source C# Core/App, alur vault/backup, protokol FK, tes simulator, dan packaging. Audit statis dan tes otomatis; tidak menghubungi mesin presensi kantor.
 
 ## Temuan yang diperbaiki

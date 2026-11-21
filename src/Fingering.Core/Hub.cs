@@ -281,6 +281,41 @@ public sealed class Hub
         return $"{users.Count} user di mesin, {inDb} sudah di database, {fails} nama gagal dibaca";
     }
 
+    /// <summary>Baca daftar user dan password enroll 10; tidak mengubah data di mesin.</summary>
+    public Job Passwords(long deviceId) => Session(deviceId, "tarik-password", async (d, c, info, j) =>
+    {
+        c.Cfg.Trace = null; // Halaman ini hanya mencatat status; jangan tampilkan payload user/enroll di konsol.
+        if (info.Dialect != "13_1") throw new FkException("tarik password baru didukung untuk dialek 13_1; mesin ini belum didukung");
+        var users = await c.ReadUsers();
+        var names = Store.Employees("").ToDictionary(e => e.Pin, e => e.Name);
+        var reads = new List<PasswordRead>();
+        int fetched = 0, absent = 0, failed = 0;
+        foreach (var u in users)
+        {
+            string name = names.GetValueOrDefault(u.Id, "");
+            try { var detail = await c.UserInfo(u.Id, DateTime.Now); if (detail.name != "") name = detail.name; }
+            catch (Exception e) when (e is FkException or TimeoutException) { j.Line($"PIN {u.Id}: nama mesin tidak terbaca; memakai nama lokal"); }
+            bool hasPassword = (u.Mask & 1) != 0;
+            byte[]? raw = null;
+            string error = "";
+            if (!hasPassword) absent++;
+            else
+            {
+                try { raw = await c.EnrollData(u.Id, 10); fetched++; }
+                catch (Exception e) when (e is FkException or TimeoutException)
+                {
+                    failed++;
+                    error = e is TimeoutException ? "Mesin tidak merespons saat membaca password" : "Mesin menolak atau gagal mengirim data password";
+                }
+            }
+            reads.Add(new(u.Id, name, u.Privilege, hasPassword, raw, error));
+            j.Line($"PIN {u.Id}: {(error != "" ? "gagal membaca password" : hasPassword ? "data password ditarik" : "tidak ada password")}");
+            j.SetProgress(reads.Count, users.Count);
+        }
+        Store.SavePasswordSnapshot(d.Id, reads);
+        return $"{users.Count} user: {fetched} data password ditarik, {absent} tanpa password, {failed} gagal. Lihat tabel PASSWORD USER";
+    });
+
     /// <summary>Mengunduh data sidik jari mentah. pins kosong = semua user yang punya sidik jari.</summary>
     public Job Fingerprints(long deviceId, IReadOnlyCollection<string>? pins = null) => Session(deviceId, "sidik-jari", async (d, c, info, j) =>
     {

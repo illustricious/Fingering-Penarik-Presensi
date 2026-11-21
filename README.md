@@ -8,6 +8,7 @@ Proyek independen milik illustricious, tidak berafiliasi dengan produsen Fingers
 
 - Uji koneksi, tarik seluruh log/rentang tanggal, sinkronisasi data baru, pantau jumlah log.
 - Kelola pegawai/shift, hitung keterlambatan/lupa absen, ekspor XLSX.
+- Tarik data password user (dialek FK `13_1`) dan lihat tabel per mesin, pencarian PIN/nama, status baca, kandidat angka tersamar, serta waktu penarikan.
 - Database SQLCipher, kunci acak 256 bit, login dan kode pemulihan melalui vault AES-GCM.
 - Backup `.fingbak` terenkripsi dengan sandi terpisah, migrasi database lama.
 - Operasi hapus log/user dinonaktifkan secara bawaan, dengan pencadangan dan konfirmasi.
@@ -16,7 +17,21 @@ Saat pertama dibuka, buat ID dan sandi melalui setup. **Simpan kode pemulihan** 
 
 Data berada di direktori ApplicationData pengguna, subfolder `illustricious/Fingering`: `%APPDATA%` pada Windows, `~/.config` pada Linux, `~/Library/Application Support` pada macOS. Gunakan `--data <folder>` untuk lokasi lain. Data presensi, sidik jari, sandi, vault dan backup tidak dimasukkan ke Git.
 
+## Tarik password user
+
+1. Buka tab **PASSWORD USER** (atau **MESIN → opsi lanjutan → PASSWORD USER**).
+2. Pilih mesin, tekan **TARIK PASSWORD**. Aplikasi membaca daftar user dan data enroll password; tidak mengubah/hapus data di mesin.
+3. Tabel menampilkan PIN, nama, hak akses, kandidat password, status dan waktu baca. Gunakan **LIHAT/TUTUP** untuk membuka/menyamarkan kandidat per baris; **DETAIL** menampilkan kegagalan dan data mentah bila dibuka secara sengaja.
+
+**Angka yang tampil adalah kandidat teks, belum bukti password asli.** Hanya rekaman dengan header PIN/jenis yang sesuai serta field teks numerik 1–8 digit dengan padding nol yang dikenali. Nol di depan dipertahankan. Format biner lain tidak ditebak dan ditandai **Format belum dikenali**. Belum ada verifikasi terhadap mesin fisik.
+
+User tanpa password dan pembacaan gagal dibedakan. Bila tarik ulang gagal, data sukses sebelumnya dipertahankan dengan penanda **data lama**. User/password yang sudah dihapus dari mesin tercermin pada penarikan sukses berikutnya. Hasil disimpan per mesin dalam database terenkripsi, ikut backup/restore, dan tidak dicetak ke konsol atau ekspor presensi.
+
 ## Build dan tes
+
+Tampilan tab baru dengan data contoh:
+
+![Tabel password user dengan data contoh](docs/password-user-table.png)
 
 Prasyarat: .NET SDK 10. Runtime .NET disertakan dalam paket distribusi.
 
@@ -41,11 +56,11 @@ Workflow [Build packages](.github/workflows/build.yml) menjalankan tes, build da
 
 | Target | Hasil |
 |---|---|
-| Windows Intel/AMD x64 | `Fingering-1.0.0-win-x64.exe` (portable) |
-| Windows ARM64 | `Fingering-1.0.0-win-arm64.exe` (portable) |
-| Linux x64 | `fingering_1.0.0_amd64.deb`, `fingering-1.0.0-1.x86_64.rpm` |
-| Mac Apple Silicon | `Fingering-1.0.0-osx-arm64.dmg` |
-| Mac Intel | `Fingering-1.0.0-osx-x64.dmg` |
+| Windows Intel/AMD x64 | `Fingering-1.1.0-win-x64.exe` (portable) |
+| Windows ARM64 | `Fingering-1.1.0-win-arm64.exe` (portable) |
+| Linux x64 | `fingering_1.1.0_amd64.deb`, `fingering-1.1.0-1.x86_64.rpm` |
+| Mac Apple Silicon | `Fingering-1.1.0-osx-arm64.dmg` |
+| Mac Intel | `Fingering-1.1.0-osx-x64.dmg` |
 
 Setiap artifact paket menyertakan checksum SHA-256. Versi mengikuti `src/Fingering.App/Fingering.App.csproj`. DMG memakai tanda tangan **ad-hoc**, belum Developer ID/notarized; Gatekeeper dapat meminta persetujuan untuk aplikasi unduhan. Notarization memerlukan akun/sertifikat Apple Developer pemilik proyek.
 

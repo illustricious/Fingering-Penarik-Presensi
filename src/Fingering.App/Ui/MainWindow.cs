@@ -12,7 +12,7 @@ using Fingering.Core;
 
 namespace Fingering.Ui;
 
-public sealed class MainWindow : Window
+public sealed partial class MainWindow : Window
 {
     readonly string user;
     readonly Border content = new() { Padding = new Thickness(0) };
@@ -33,9 +33,10 @@ public sealed class MainWindow : Window
     string page = "dasbor";
     int punchOffset;
     readonly PunchFilter filter = new();
+    Action<bool> setConsoleExpanded = _ => { };
 
     static readonly (string key, string label)[] Pages =
-    [("dasbor", "DASBOR"), ("mesin", "MESIN"), ("presensi", "PRESENSI"), ("pegawai", "PEGAWAI"), ("riwayat", "RIWAYAT"), ("setelan", "SETELAN")];
+    [("dasbor", "DASBOR"), ("mesin", "MESIN"), ("presensi", "PRESENSI"), ("pegawai", "PEGAWAI"), ("password", "PASSWORD USER"), ("riwayat", "RIWAYAT"), ("setelan", "SETELAN")];
 
     public MainWindow(string user)
     {
@@ -86,14 +87,15 @@ public sealed class MainWindow : Window
         Grid.SetColumn(clr, 1); conBar.Children.Add(clr);
         var conPanel = new Border { Background = Neo.B(Neo.Pink), BorderBrush = Neo.B(Neo.Ink), BorderThickness = new Thickness(0, 3, 0, 0), Padding = new Thickness(24, 10, 24, 14) };
         Button? toggle = null;
-        toggle = Neo.Btn("SEMBUNYIKAN ▼", () =>
+        void ExpandConsole(bool expanded)
         {
-            bool hide = conView.IsVisible;   // sedang tampil -> sembunyikan; isi dan status di judul tetap diperbarui
-            conView.IsVisible = !hide;
-            toggle!.Content = hide ? "TAMPILKAN ▲" : "SEMBUNYIKAN ▼";
-            conBar.Margin = new Thickness(0, 0, 0, hide ? 0 : 6);
-            conPanel.Padding = new Thickness(24, 10, 24, hide ? 10 : 14);
-        }, "yellow");
+            conView.IsVisible = expanded;
+            toggle!.Content = expanded ? "SEMBUNYIKAN ▼" : "TAMPILKAN ▲";
+            conBar.Margin = new Thickness(0, 0, 0, expanded ? 6 : 0);
+            conPanel.Padding = new Thickness(24, 10, 24, expanded ? 14 : 10);
+        }
+        toggle = Neo.Btn("SEMBUNYIKAN ▼", () => ExpandConsole(!conView.IsVisible), "yellow");
+        setConsoleExpanded = ExpandConsole;
         toggle.Margin = new Thickness(0); toggle.Padding = new Thickness(8, 2);
         Grid.SetColumn(toggle, 2); conBar.Children.Add(toggle);
         // bar progres menyatu dengan panel konsol, di atas kotak log; tetap tampak saat log disembunyikan
@@ -122,8 +124,17 @@ public sealed class MainWindow : Window
         var barTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(60) };
         barTimer.Tick += (_, _) => UpdateBar();
         barTimer.Start();
-        App.Hub.JobStarted += j => Dispatcher.UIThread.Post(() => Watch(j));
-        App.Hub.DataChanged += () => Dispatcher.UIThread.Post(() => { if (page is "dasbor" or "mesin" or "riwayat" or "pegawai") Go(page, keepScroll: true); });
+        Action<Job> jobStarted = j => Dispatcher.UIThread.Post(() => { if (IsVisible) Watch(j); });
+        Action dataChanged = () => Dispatcher.UIThread.Post(() => { if (IsVisible && (page is "dasbor" or "mesin" or "riwayat" or "pegawai" or "password")) Go(page, keepScroll: true); });
+        App.Hub.JobStarted += jobStarted;
+        App.Hub.DataChanged += dataChanged;
+        Closed += (_, _) =>
+        {
+            timer.Stop(); barTimer.Stop();
+            App.Hub.JobStarted -= jobStarted; App.Hub.DataChanged -= dataChanged;
+            if (watched != null) watched.Changed -= OnJobChanged;
+            content.Child = null; con.Text = "";
+        };
         Go("dasbor");
     }
 
@@ -194,6 +205,7 @@ public sealed class MainWindow : Window
     void Go(string key, bool keepScroll = false)
     {
         var keep = keepScroll && page == key ? scroller.Offset : default;
+        if (key == "password" && page != key) setConsoleExpanded(false);
         page = key;
         foreach (var c in nav.Children.OfType<Button>())
         {
@@ -204,6 +216,7 @@ public sealed class MainWindow : Window
             "mesin" => DevicesPage(),
             "presensi" => PunchesPage(),
             "pegawai" => EmployeesPage(),
+            "password" => PasswordsPage(),
             "riwayat" => RunsPage(),
             "setelan" => SettingsPage(),
             _ => DashboardPage(),
@@ -282,6 +295,7 @@ public sealed class MainWindow : Window
         var adv = new WrapPanel { IsVisible = false };
         adv.Children.Add(Neo.Btn("INFO & JAM MESIN", () => Run(() => App.Hub.InfoJob(d.Id)), "white"));
         adv.Children.Add(Neo.Btn("LIHAT USER DI MESIN", () => Run(() => App.Hub.Users(d.Id, "lihat")), "white"));
+        adv.Children.Add(Neo.Btn("PASSWORD USER →", () => { passwordDeviceId = d.Id; passwordOffset = 0; Go("password"); }, "blue"));
         adv.Children.Add(Neo.Btn("TARIK PEGAWAI (BARU)", () => Run(() => App.Hub.Users(d.Id, "baru")), "white"));
         adv.Children.Add(Neo.Btn("TARIK PEGAWAI + PERBARUI NAMA", async () =>
         {

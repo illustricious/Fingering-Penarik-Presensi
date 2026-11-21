@@ -1,15 +1,19 @@
 Fingering adalah rewrite aplikasi desktop penarik presensi Fingerspot Revo menggunakan Avalonia dan .NET 10.
 
+Versi ini menambahkan **PASSWORD USER**: pilih mesin, tarik data password tanpa mengubah mesin, lalu lihat tabel PIN/nama/hak akses/status/waktu baca. Tersedia pencarian, paginasi, tombol lihat/sembunyikan per baris, dan detail data mentah. Hasil disimpan terenkripsi per mesin dan ikut backup/restore. Gagal tarik ulang ditandai sebagai data lama; payload password tidak masuk log.
+
+**Kandidat angka belum diverifikasi terhadap password asli perangkat.** Teks numerik hanya dikenali dengan header/format yang cocok; data biner tidak ditebak. Fitur baru mendukung dialek FK `13_1` dan telah diuji dengan simulator, belum mesin fisik.
+
 Pilih paket sesuai OS dan arsitektur:
 
 | Platform | File |
 |---|---|
-| Windows Intel/AMD 64-bit | `Fingering-1.0.0-win-x64.exe` |
-| Windows ARM64 (mis. Snapdragon) | `Fingering-1.0.0-win-arm64.exe` |
-| Ubuntu/Debian x64 | `fingering_1.0.0_amd64.deb` |
-| Fedora/RHEL x64 | `fingering-1.0.0-1.x86_64.rpm` |
-| Mac Intel | `Fingering-1.0.0-osx-x64.dmg` |
-| Mac Apple Silicon | `Fingering-1.0.0-osx-arm64.dmg` |
+| Windows Intel/AMD 64-bit | `Fingering-1.1.0-win-x64.exe` |
+| Windows ARM64 (mis. Snapdragon) | `Fingering-1.1.0-win-arm64.exe` |
+| Ubuntu/Debian x64 | `fingering_1.1.0_amd64.deb` |
+| Fedora/RHEL x64 | `fingering-1.1.0-1.x86_64.rpm` |
+| Mac Intel | `Fingering-1.1.0-osx-x64.dmg` |
+| Mac Apple Silicon | `Fingering-1.1.0-osx-arm64.dmg` |
 
 Runtime .NET disertakan. EXE Windows bersifat portable; jalankan langsung. Pada macOS, buka DMG lalu seret Fingering ke Applications. Saat pertama dibuka, buat ID/sandi sendiri dan simpan kode pemulihan.
 

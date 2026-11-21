@@ -16,7 +16,9 @@ public sealed class Simulator : IDisposable
     public uint CommunicationKey;
     public int SetClockCalls, ClearCalls, DeleteCalls, EmptyCalls;
     public bool RefuseEnrollRead;         // meniru mesin menolak membaca data enroll (cadangan harus gagal)
-    public sealed class SimUser { public string Id = "", Name = ""; public int Priv; public ushort Mask; }
+    public sealed class SimUser { public string Id = "", Name = ""; public int Priv; public ushort Mask; public byte[] PasswordBytes = []; public bool RefusePassword; }
+    public int PasswordReadCalls;
+    public readonly System.Collections.Concurrent.ConcurrentDictionary<byte, int> CommandCounts = new();
     public readonly List<SimUser> Roster = [];
     public readonly List<DateTime> Times = [];
 
@@ -121,6 +123,7 @@ public sealed class Simulator : IDisposable
                 if (buf[0] != 0x55 || buf[1] != 0xAA) { buf.RemoveAt(0); continue; }
                 var h = buf.GetRange(0, 16).ToArray(); buf.RemoveRange(0, 16);
                 byte cmd = h[3];
+                CommandCounts.AddOrUpdate(cmd, 1, (_, count) => count + 1);
                 uint param = BinaryPrimitives.ReadUInt32LittleEndian(h.AsSpan(4));
                 int idx = BinaryPrimitives.ReadUInt16LittleEndian(h.AsSpan(10)), ln = BinaryPrimitives.ReadUInt16LittleEndian(h.AsSpan(12));
                 ushort seq = BinaryPrimitives.ReadUInt16LittleEndian(h.AsSpan(14));
@@ -170,7 +173,16 @@ public sealed class Simulator : IDisposable
                         {
                             if (RefuseEnrollRead) { code = 0; break; }
                             var d = new byte[Features.EnrollSize(pendingTag)];
-                            for (int i = 0; i < d.Length; i++) d[i] = (byte)(i + pendingTag);
+                            if (pendingTag == 10)
+                            {
+                                Interlocked.Increment(ref PasswordReadCalls);
+                                var user = Roster.FirstOrDefault(u => u.Id == pending);
+                                if (user == null || (user.Mask & 1) == 0 || user.RefusePassword) { code = 0; break; }
+                                Encoding.ASCII.GetBytes(user.Id).CopyTo(d, 0);
+                                d[32] = 10; d[50] = (byte)user.Priv;
+                                user.PasswordBytes.AsSpan(0, Math.Min(32, user.PasswordBytes.Length)).CopyTo(d.AsSpan(52));
+                            }
+                            else for (int i = 0; i < d.Length; i++) d[i] = (byte)(i + pendingTag);
                             data = Slice(d, idx, ln);
                         }
                         break;
@@ -185,6 +197,11 @@ public sealed class Simulator : IDisposable
                         {
                             var id = Encoding.ASCII.GetString(body, 0, 32).TrimEnd('\0');
                             if (Roster.All(r => r.Id != id)) Roster.Add(new SimUser { Id = id, Priv = body[50], Mask = 1 });
+                            if (body[32] == 10)
+                            {
+                                var user = Roster.First(r => r.Id == id);
+                                user.Mask |= 1; user.PasswordBytes = body[52..84];
+                            }
                         }
                         break;
                     case Cmd.SetUserInfo:
