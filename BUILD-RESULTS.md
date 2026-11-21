@@ -1,4 +1,20 @@
-# Hasil build audit — 19 November 2026
+# Hasil build dan validasi Fingering
+
+## Release 1.1.0 — password user — 21 November 2026
+
+[Release 1.1.0](https://github.com/illustricious/Fingering-Penarik-Presensi/releases/tag/v1.1.0) menggunakan source `f2b2b111482cd59dd4a7030d52a476370673bc98`. [Workflow build dan publikasi](https://github.com/illustricious/Fingering-Penarik-Presensi/actions/runs/44870797384) selesai **success** pada kelima runner dan job release.
+
+| Runner native | Tes |
+|---|---|
+| Windows x64 | 99/99 lulus |
+| Windows ARM64 | 99/99 lulus |
+| Ubuntu Linux x64 | 99/99 lulus |
+| Mac Intel | 99/99 lulus |
+| Mac Apple Silicon | 99/99 lulus |
+
+Penambahan tes mencakup penarikan password baca-saja, communication key, kerahasiaan log, hasil campuran/gagal/data lama, isolasi mesin, migrasi DB lama, enkripsi dan backup/restore, serta interaksi kontrol UI nyata pada platform headless Skia (navigasi tab, penyamaran/lihat/sembunyikan ulang, pencarian dan paginasi). [Render tabel](docs/password-user-table.png) menggunakan data fixture, bukan data kantor.
+
+Keenam paket program, checksum dan laporan audit telah dipublikasikan sebagai delapan aset. Hash keenam paket dari manifest release cocok dengan digest SHA-256 GitHub. Format ASCII tetap disebut kandidat dan belum diverifikasi terhadap password asli perangkat. Tidak ada pengujian terhadap mesin kantor; DMG tetap ad-hoc dan EXE belum Authenticode-signed.
 
 ## Release v1.0.0, termasuk Windows ARM64
 
